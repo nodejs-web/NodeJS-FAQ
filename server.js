@@ -1,7 +1,10 @@
-var http = require('http');
-var port = 18080;
-http.createServer(function(req, res) {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write('<h1>Node.js</h1>');
-    res.end('<p>Hello World</p>');
-}).listen(port);
+#!/usr/bin/env node
+var debug = require('debug')('NodeJS-FAQ');
+var app = require('./app');
+var config = require('./config');
+app.set('port', config.server.port || 18080);
+
+var server = app.listen(app.get('port'), function() {
+  debug('Express server listening on port ' + server.address().port);
+  console.log('NodeJS-FAQ Server is running at port '+ server.address().port); 
+});

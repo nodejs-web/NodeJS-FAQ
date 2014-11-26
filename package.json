@@ -1,10 +1,11 @@
 {
-<<<<<<< HEAD
   "name": "NodeJS-FAQ",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
+  "author" : "jameslong | closure | zhaomaoxin",
+  "description":"NodeJS-FAQ, a FAQ website for Node.js",
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node server.js"
   },
   "dependencies": {
     "express": "~4.9.0",
@@ -16,16 +17,3 @@
     "ejs": "~0.8.5"
   }
 }
-=======
-    "name": "bae-nodejs",
-    "version": "1.0.0",
-    "author": "bae",
-    "description": "The first bae nodejs app!",
-    "scripts": {
-        "start": "node server.js"
-    },
-    "dependencies": {
-    }
-}
-
->>>>>>> b9954089722038baf0cd8ebeb471e62b77376d29
