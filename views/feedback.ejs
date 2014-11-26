@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<% include header.ejs %>
+<body>
+<% include navbar.ejs %>
+<div class="page-header">
+
+</div>
+<div class="">
+    <div class="container">
+        <form class="form-signin" role="form" style="max-width:650px; margin:0 auto;" action="/feedback" method="post">
+            <h3 class="form-signin-heading">意见反馈</h3>
+            <input type="email" name="email" class="form-control" placeholder="请填写邮箱" required autofocus>
+            <br/>
+            <br/>
+            <br/>
+            <textarea class="form-control" name="feedback" rows="5" placeholder="在这里填写建议" style="max-width:650px;max-height: 400px;"></textarea>
+            <br/>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">提交反馈</button>
+        </form>
+   </div>
+</div>
+</body>
+<% include footer.ejs %>
+</html>

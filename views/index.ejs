@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <% include header.ejs %>
+  <body>
+     <% include navbar.ejs %>
+     <div class="page-header">
+
+     </div>
+     <div class="main">
+         <div class="container">
+             <div class="row">
+                 <div class="col-lg-8 col-md-8">
+                     <% include search.ejs %>
+                 </div>
+                 <div class="col-lg-4 col-md-4">
+                     <div class="">
+                         <!-- 发布问题按钮-->
+                         <button class="btn btn-primary btn-lg">我有问题</button>
+                         <!-- 查看为解决的问题-->
+                         <button class="btn btn-info btn-lg">他有问题</button>
+                         <!-- 大家的问题 -->
+                         <button class="btn btn-success btn-lg">没有问题</button>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     </div>
+
+
+  </body>
+  <% include footer.ejs %>
+</html>
