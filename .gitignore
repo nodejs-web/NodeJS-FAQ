@@ -29,3 +29,9 @@ node_modules
 
 # WebStorm ide config
 /.idea/
+
+# NodeJS-FAQ
+/NodeJS-FAQ/
+
+# BAE .baeapp
+.baeapp
