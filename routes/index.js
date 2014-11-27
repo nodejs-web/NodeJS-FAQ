@@ -5,55 +5,74 @@ var router = express.Router();
 
 //首页
 router.get('/', function(req, res) {
-  res.render('index', { title: 'Express' });
+  res.render('index', { title: 'Express'});
 });
 
 //搜索
-router.all('/search', function(req, res, next){
-  var body = req.body;
-  var word = req.body.content;
-  console.log(body);
-  return res.redirect('back');
-  //使用分词技术，从数据库中查找并返回
-  //var question = new models.Question();
-  //question.find({},function(error,questions){
-  //  if(error){
-  //    return next(error);
-  //  }
+router.get('/search', function(req, res, next){
+  //搜索词列表
+  var words = decodeURI(req.query.keyword).split(' ');
 
-    //返回JSON数据
-    //return res.send(questions);
-  //});
+  console.log(words);
+  //使用分词技术
+
+  //从数据库中进行检索
+
+  //将数据反馈
+
+  //后期可考虑使用爬虫
+  query(words, function(error, data){
+    if(error){
+      return next(error);
+    }
+    //ajax 请求
+    if(req.xhr){
+      //返回json数据
+      return res.send(data, 200);
+    }else{
+      //渲染页面
+      return res.render('questions',{
+        ques: data
+      });
+    }
+  })
+
 });
 
-//router.get('/product', function(req, res, next){
-//
-//});
-//
-//
-//router.get('/effect', function(req, res, next){
-//
-//});
+router.get('/questions', function(req, res, next){
+  //默认查询
+  var keyword = req.query.keyword !== undefined ? req.query.keyword : '';
+
+  //根据keyword查询
+  return res.render('questions', {
+    keyword: 'Node.js 开发常见问题汇总'
+  });
+});
 
 //发布问题
-router.post('/faq', function(req, res, next){
-  var body = req.body;
-  var content = body.content;
-  var date     = new Date();
-  console.log(body);
-  //var question = new models.Question();
+router.all('/faq', function(req, res, next){
+  if(req.method.toLowerCase() === 'get'){
+    res.render('faq');
+  }else{
+    var body = req.body;
+    var title  = body.title;
+    var description = body.description;
+    var date     = new Date();
+    console.log(body);
+    //var question = new models.Question();
 
-  //question.save({
-  //  content:content,
-  //  date: date
-  //},function(error){
-  //  if(error){
-  //    return next(error);
-  //  }
+    //question.save({
+    //  content:content,
+    //  date: date
+    //},function(error){
+    //  if(error){
+    //    return next(error);
+    //  }
 
     //问题发布完成
     return res.redirect('back');
-  //});
+    //});
+  }
 });
 
 //问题留言
@@ -115,5 +134,68 @@ router.all('/feedback',function(req, res){
     //});
   }
 });
+
+//搜索问题
+function queQue(keyword, callback){
+  var que = new Que();
+  //建立查询条件
+  que.find({},function(error, data){
+    if(error){
+      return callback(error);
+    }
+    //返回查询结果
+    return callback(null, data);
+  });
+}
+
+//查看问题
+function queDet(id, callback){
+  var det = new Det();
+  det.findOne(id, function(error, data){
+    if(error){
+      return callback(error);
+    }
+
+    return callback(null, data);
+  });
+}
+
+//添加问题
+function addFaq(data,callback){
+  data = data || {};
+  var faq  = new Faq();
+  faq.save(data, function(error, data){
+    if(error){
+      return callback(error);
+    }
+    return callback(null, data);
+  });
+}
+
+
+//添加反馈
+function addFeed(data, callback){
+  data = data || {};
+  var feed = new Feed();
+  feed.save(data, function(error, data){
+    if(error){
+      return callback(error);
+    }
+
+    return callback(null, data);
+  });
+}
+
+//添加评论
+function addCom(data, callback){
+  data = data || {};
+  var com = new Com();
+  com.save(data, function(error, data){
+    if(error){
+      return callback(error);
+    }
+    return callback(null, data);
+  });
+}
 
 module.exports = router;
