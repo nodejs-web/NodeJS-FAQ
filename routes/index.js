@@ -1,7 +1,11 @@
 var express = require('express');
 var router = express.Router();
 
-//var models = require('../models');
+var models      = require('../models');
+var FeedBack    = models.FeedBackModel;
+var Comment     = models.CommentModel;
+var Question    = models.QuestionModel;
+var FAQ         = models.FAQModel;
 
 //首页
 router.get('/', function(req, res) {
