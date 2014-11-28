@@ -6,3 +6,17 @@ body {
 a {
   color: #00B7FF;
 }
+
+.main{
+  margin-top:15px;
+}
+
+.questionList{
+
+}
+
+.questionList li{
+   list-style-type: decimal-leading-zero;
+   line-height: 25px;
+   font-size:16px;
+}

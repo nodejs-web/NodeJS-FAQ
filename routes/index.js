@@ -1,7 +1,10 @@
 var express = require('express');
+var moment = require('moment');
 var router = express.Router();
+var func   = require('../lib/function');
+require('date-utils'); //时间处理
 
-var models      = require('../models');
+var models      = require('../lib/model');
 var FeedBack    = models.FeedBackModel;
 var Comment     = models.CommentModel;
 var Question    = models.QuestionModel;
@@ -9,23 +12,31 @@ var FAQ         = models.FAQModel;
 
 //首页
 router.get('/', function(req, res) {
-  res.render('index', { title: 'Express'});
+  return res.render('index');
+});
+
+//跳转question 页面
+router.get('/questions', function(req, res, next){
+  queList(function(error, questions){
+    if(error){
+      return next(error);
+    }
+
+    console.log(questions);
+    return res.render('questions', {
+      questions: questions
+    });
+  });
 });
 
 //搜索
-router.get('/search', function(req, res, next){
-  //搜索词列表
-  var words = decodeURI(req.query.keyword).split(' ');
-
-  console.log(words);
-  //使用分词技术
-
-  //从数据库中进行检索
-
-  //将数据反馈
-
+router.get('/search', func.sep(), function(req, res, next){
+   //原条件
+   var query = req.query.keyword;
+   //分词列表
+   var words = req.queryWords;
   //后期可考虑使用爬虫
-  query(words, function(error, data){
+  queQue(words, function(error, data){
     if(error){
       return next(error);
     }
@@ -36,21 +47,25 @@ router.get('/search', function(req, res, next){
     }else{
       //渲染页面
       return res.render('questions',{
-        ques: data
+        ques: data,
+        keyword:query
       });
     }
-  })
-
+  });
 });
 
-router.get('/questions', function(req, res, next){
-  //默认查询
-  var keyword = req.query.keyword !== undefined ? req.query.keyword : '';
+//查看详情
+router.get('/view/*',function(req, res, next){
+   var id = req.params['0'];
+   queDet(id, function(error, data){
+      if(error){
+        return next(error);
+      }
 
-  //根据keyword查询
-  return res.render('questions', {
-    keyword: 'Node.js 开发常见问题汇总'
-  });
+      return res.render('detail', {
+          data : data
+      });
+   });
 });
 
 //发布问题
@@ -59,23 +74,15 @@ router.all('/faq', function(req, res, next){
     res.render('faq');
   }else{
     var body = req.body;
-    var title  = body.title;
-    var description = body.description;
-    var date     = new Date();
-    console.log(body);
-    //var question = new models.Question();
-
-    //question.save({
-    //  content:content,
-    //  date: date
-    //},function(error){
-    //  if(error){
-    //    return next(error);
-    //  }
-
-    //问题发布完成
-    return res.redirect('back');
-    //});
+    //数据处理
+    addFaq(body, function(error,result){
+      if(error){
+        return next(error);
+      }
+      console.log(result);
+      //问题发布完成
+      return res.redirect('back');
+    });
   }
 });
 
@@ -83,92 +90,89 @@ router.all('/faq', function(req, res, next){
 router.post('/comment', function(req, res, next){
   var body = req.body;
   //需要获取问题编号，留言内容
-  var id = body.id;
-  var content = body.content;
+  addCom(body, function(error, result){
+    if(error){
+      return next(error);
+    }
 
-  console.log(body);
-  //var comment = new models.Comment();
-  //comment.save({
-  //  id:id,
-  //  content:content,
-  //  date: new Date
-  //},function(error){
-  //  if(error){
-  //    return next(error);
-  //  }
-    //提交完成（此处可以选择ajax提交）
+    console.log(result);
     return res.redirect('back');
-  //});
+  });
 });
-
-
-//关于我们
-router.get('/about', function(req, res){
-  res.render('about');
-});
-
 
 //意见反馈
-router.all('/feedback',function(req, res){
+router.all('/feedback',function(req, res, next){
   if(req.method.toLowerCase() === 'get'){
     //反馈表单
     return res.render('feedback');
   }else {
     var body = req.body;
-    //反馈内容
     console.log(body);
-    //需要对客户端输入进行处理（安全考虑）
-    //var email = body.email;
-    //var content = body.content;
-    //var date   = new Date();
+    //反馈内容
+    addFeed(body, function(error, result){
+      if(error){
+        return next(error);
+      }
 
-    //实例化FeedBack
-    //var feedback = new models.FeedBack();
-    ////存储反馈信息
-    //feedback.save({
-    //   email:email,
-    //   content: content,
-    //   date: date
-    //},function(error){
-    //  if(error){
-    //    return next(error);
-    //  }
-    //  //反馈完成
       return res.redirect('back');
-    //});
+    });
   }
 });
 
-//搜索问题
-function queQue(keyword, callback){
-  var que = new Que();
-  //建立查询条件
-  que.find({},function(error, data){
+function queList(callback){
+  //
+  FAQ.find({},function(error, data){
     if(error){
       return callback(error);
     }
+
+    data.forEach(function(item){
+      //var d = new Date(item.date);
+      item.date = item.time = (item.date).toFormat("YYYY-MM-DD HH24:MM:SS");
+    });
+    return callback(null, data);
+  });
+}
+
+//搜索问题
+function queQue(keyword, callback){
+  //建立查询条件
+  FAQ.find({title :keyword, body: keyword },function(error, data){
+    if(error){
+      return callback(error);
+    }
+    data.forEach(function(item){
+      //var d = new Date(item.date);
+      console.log(item.date);
+      item.date = item.time = (item.date).toFormat("YYYY-MM-DD HH24:MM:SS");
+    });
     //返回查询结果
     return callback(null, data);
   });
 }
 
-//查看问题
+//查看具体问题
 function queDet(id, callback){
-  var det = new Det();
-  det.findOne(id, function(error, data){
+  FAQ.findOne({_id :id}, function(error, data){
     if(error){
       return callback(error);
     }
-
+    //console.log(data.date);
+    //var d = new Date(data.date);
+    console.log(data.date);
+    data.date = data.time = (data.date).toFormat("YYYY-MM-DD HH24:MM:SS");
+    //data.time =  moment(data.date).format("YYYY-MM-DD HH:mm:ss");
     return callback(null, data);
   });
 }
 
 //添加问题
 function addFaq(data,callback){
-  data = data || {};
-  var faq  = new Faq();
-  faq.save(data, function(error, data){
+  var faq   = new FAQ();
+  faq.body  = data.description;
+  faq.title = data.title;
+  faq.date   = Date.now();
+  faq.save(function(error, data){
     if(error){
       return callback(error);
     }
@@ -179,9 +183,11 @@ function addFaq(data,callback){
 
 //添加反馈
 function addFeed(data, callback){
-  data = data || {};
-  var feed = new Feed();
-  feed.save(data, function(error, data){
+  var feed = new FeedBack();
+  feed.email  = data.email;
+  feed.body   = data.feedback;
+  feed.date   = Date.now();
+  feed.save(function(error, data){
     if(error){
       return callback(error);
     }
@@ -192,14 +198,22 @@ function addFeed(data, callback){
 
 //添加评论
 function addCom(data, callback){
-  data = data || {};
-  var com = new Com();
+  var com = new Comment();
+  com.faq = data.id;
+  com.body = data.content;
+  com.date   = Date.now();
   com.save(data, function(error, data){
     if(error){
       return callback(error);
     }
     return callback(null, data);
   });
+}
+
+function format(time){
+
+  time = time.getTime();  // + 8*60*60*1000;  如果少了8小时 就加上这个时间
+  return  moment(time).format("YYYY-MM-DD HH:mm:ss");
 }
 
 module.exports = router;

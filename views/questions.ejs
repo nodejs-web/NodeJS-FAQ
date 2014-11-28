@@ -10,7 +10,11 @@
             <div class="col-lg-9 col-md-9">
                 <form  action="/search" method="get">
                     <div class="input-group input-group-lg">
-                        <input type="text" id="keyword" name="keyword" class="form-control" placeholder="有问题，就搜吧！ " value="<%= keyword || 'Node.js 常见问题' %>">
+                        <%if(typeof keyword !== 'undefined'){ %>
+                            <input type="text" id="keyword" name="keyword" class="form-control" placeholder="有问题，就搜吧！ " value="<%= keyword %>">
+                        <% }else{ %>
+                            <input type="text" id="keyword" name="keyword" class="form-control" placeholder="有问题，就搜吧！ " value="">
+                        <% } %>
             <span class="input-group-btn">
                 <button class="btn btn-success" id="searchBtn"  type="button">搜索</button>
             </span>
@@ -20,7 +24,22 @@
             <div class="col-lg-3 col-md-3">
 
             </div>
+
         </div>
+    </div>
+</div>
+<div class="main">
+    <div class="container">
+        <% if(typeof questions !== 'undefined'){ %>
+           <ul class="questionList">
+               <% questions.forEach(function(question){ %>
+                   <li>
+                       <a href="/view/<%= question._id %>">
+                           <p><span> <%- question.title %></span><span class="navbar-right"><%= question.date %></span> </p>
+                       </a></li>
+               <% }); %>
+           </ul>
+        <% } %>
     </div>
 </div>
 

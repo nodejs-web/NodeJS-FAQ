@@ -1,0 +1,62 @@
+<!-- 问题详情 -->
+<!-- 搜索结果 -->
+<!DOCTYPE html>
+<html>
+<% include header.ejs %>
+<body>
+<% include navbar.ejs %>
+
+<!-- 搜索 -->
+<div class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-9 col-md-9">
+                <form  action="/search" method="get">
+                    <div class="input-group input-group-lg">
+                        <%if(typeof keyword !== 'undefined'){ %>
+                        <input type="text" id="keyword" name="keyword" class="form-control" placeholder="有问题，就搜吧！ " value="<%= keyword %>">
+                        <% }else{ %>
+                        <input type="text" id="keyword" name="keyword" class="form-control" placeholder="有问题，就搜吧！ " value="">
+                        <% } %>
+                        <span class="input-group-btn">
+                <button class="btn btn-success" id="searchBtn"  type="button">搜索</button>
+            </span>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-3 col-md-3">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- 文章-->
+<div class="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-9 col-md-9">
+                <div class="article">
+                    <div class="page-header">
+                        <h2><%= data.title %></h2>
+                        <span><%= data.date %></span>
+                    </div>
+                    <div class="bs-docs-section">
+                        <p><%- data.body %></p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- 评论 -->
+<div class="main">
+    <div class="container">
+
+    </div>
+</div>
+</body>
+<% include footer.ejs %>
+</html>
